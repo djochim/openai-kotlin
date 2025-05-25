@@ -104,7 +104,7 @@ internal class RunsApi(val requester: HttpRequester) : Runs {
         return requester.perform {
             it.post {
                 url(path = "${ApiPath.Threads}/${threadId.id}/runs/${runId.id}/submit_tool_outputs")
-                setBody(mapOf("tool_outputs" to output))
+                setBody(ToolOutputSubmission(output, false))
                 contentType(ContentType.Application.Json)
                 beta("assistants", 2)
                 requestOptions(requestOptions)
@@ -122,11 +122,7 @@ internal class RunsApi(val requester: HttpRequester) : Runs {
         return requester
             .performSse {
                 url(path = "${ApiPath.Threads}/${threadId.id}/runs/${runId.id}/submit_tool_outputs")
-                val bodyObject = buildJsonObject {
-                    put("tool_outputs", output.toJsonArray())
-                    put("stream", JsonPrimitive(true))
-                }
-                setBody(bodyObject)
+                setBody(ToolOutputSubmission(output, true))
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Text.EventStream)
                 beta("assistants", 2)
